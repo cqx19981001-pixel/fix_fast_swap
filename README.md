@@ -83,6 +83,8 @@ pair_style lj/cut 2.5
 pair_coeff * * 1.0 1.0 2.5
 
 fix mcswap all fast/swap 1 10 12345 0.7 types 2 1 2 mu 0 2.0
+which is exactly the same as (but much faster than) the fix atom/swap command:
+fix mcswap all atom/swap 1 10 12345 0.7 semi-grand yes types 1 2 mu 0.0 2.0
 
 
 If an unsupported pair style is used, LAMMPS will terminate with an error message similar to:
