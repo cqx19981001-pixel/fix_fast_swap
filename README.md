@@ -60,16 +60,16 @@ This design prioritizes physical correctness, reproducibility, clear user feedba
 
 ## Installation
 
-1. Copy the following files into your LAMMPS `src/` directory:
+1. Copy the following files into your LAMMPS `src/MC` directory:
 
    fix_fast_swap.cpp
    fix_fast_swap.h
 
 
-2. Rebuild LAMMPS using your standard build procedure, for example:
+2. Re-compile and Rebuild LAMMPS using your standard build procedure, for example:
 
 
-   make mpi
+   make -j 8
 
 
 No changes to any original LAMMPS source files are required.
@@ -82,7 +82,7 @@ No changes to any original LAMMPS source files are required.
 pair_style lj/cut 2.5
 pair_coeff * * 1.0 1.0 2.5
 
-fix 1 all fast/swap 100 1 12345 300.0
+fix mcswap all fast/swap 1 10 12345 0.7 types 2 1 2 mu 0 2.0
 
 
 If an unsupported pair style is used, LAMMPS will terminate with an error message similar to:
