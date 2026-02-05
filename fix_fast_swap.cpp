@@ -66,14 +66,28 @@ FixFastSwap::FixFastSwap(LAMMPS *lmp, int narg, char **arg) :
     local_iatom_list(nullptr), nmax_local_list(0), unequal_cutoffs(0), c_pe(nullptr),
     mc_parallel_enabled(true), mc_parallel_checked(false)
 {
-  // Minimal syntax:
-  // fix ID group fast/swap Nevery swap_fraction T seed types N t1 t2 ... tN mu m1 m2 ... mN
+  // Syntax (atom/swap-compatible):
+  // fix ID group fast/swap Nevery Ncycle seed T types N t1 t2 ... tN mu m1 m2 ... mN
   //
-  // Example:
-  // fix 10 all fast/swap 1 0.2 1.0 12345 types 2 1 2 mu 0.0 0.5
+  // where:
+  //   Nevery  = invoke fix every Nevery timesteps
+  //   Ncycle  = number of MC swap attempts per invocation
+  //             (same definition as in fix atom/swap)
+  //   seed    = random number seed
+  //   T       = temperature used in the Metropolis criterion
   //
-  // Here mu list corresponds to the listed swap types in the same order.
-  // mu is stored as mu[atom_type].
+  // Example (equivalent to atom/swap usage):
+  //
+  //   fix mcswap all atom/swap 1 10 12345 0.7 semi-grand yes types 1 2 mu 0.0 2.0 ke no
+  //   fix mcswap all fast/swap 1 10 0.7 12345 types 2 1 2 mu 0 2.0
+  //
+  // In fast/swap, the number of swap attempts per invocation (Ncycle)
+  // is defined identically to fix atom/swap. No swap-fraction-based
+  // scheduling is used.
+  //
+  // The chemical potential list (mu) corresponds to the listed swap
+  // types in the same order and is stored internally as mu[atom_type].
+
 
   if (narg < 11) error->all(FLERR, "Illegal fix fast/swap command (too few args)");
 
@@ -98,12 +112,13 @@ FixFastSwap::FixFastSwap(LAMMPS *lmp, int narg, char **arg) :
   ncycle = utils::inumeric(FLERR, arg[4], false, lmp);
   if (ncycle <= 0) error->all(FLERR, "Fix fast/swap ncycle must be > 0");
 
-  const double temperature = utils::numeric(FLERR, arg[5], false, lmp);
+  seed = utils::inumeric(FLERR, arg[5], false, lmp);
+  if (seed <= 0) error->all(FLERR, "Fix fast/swap requires seed > 0");
+
+  const double temperature = utils::numeric(FLERR, arg[6], false, lmp);
   if (temperature <= 0.0) error->all(FLERR, "Fix fast/swap requires T > 0");
   beta = 1.0 / (force->boltz * temperature);
 
-  seed = utils::inumeric(FLERR, arg[6], false, lmp);
-  if (seed <= 0) error->all(FLERR, "Fix fast/swap requires seed > 0");
 
   int iarg = 7;
 
