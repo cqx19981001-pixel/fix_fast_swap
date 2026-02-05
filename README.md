@@ -116,8 +116,6 @@ If you use this fix in your research, please cite:
 > *Efficient Localized Monte Carlo Sampling for the Semi-Grand Canonical Ensemble in LAMMPS*,
 > Manuscript in preparation.
 
-(Replace with final publication details when available.)
-
 ---
 
 ## License
